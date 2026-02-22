@@ -55,11 +55,6 @@ public class RaceResultCollector : MonoBehaviour
             return ScoreManager.instance.GetScoreInt();
         }
 
-        if (GameManager.instance != null)
-        {
-            return GameManager.instance.score;
-        }
-
         return 0;
     }
 

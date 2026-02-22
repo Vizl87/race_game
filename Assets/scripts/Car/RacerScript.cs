@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System.Linq;
 using TMPro;
 
-public class RacerScript : MonoBehaviour, IDataPersistence
+public class RacerScript : MonoBehaviour
 {
     public GameObject winMenu; 
     public GameObject Car1Hud;
@@ -16,7 +15,6 @@ public class RacerScript : MonoBehaviour, IDataPersistence
     CarInputActions Controls;
 
     public float laptime;
-    public float Rank;
     public float besttime;
     public bool racestarted = false; // <-- Add this
     private bool startTimer = false;
@@ -41,41 +39,6 @@ public class RacerScript : MonoBehaviour, IDataPersistence
     private GameObject finalLapImg;
 
     private PlayerCarController carController;
-
-    public void LoadData(GameData data)
-    {
-        if (data != null)
-        {
-            string currentSceneName = SceneManager.GetActiveScene().name;
-            var sceneBestTime = data.bestTimesByMap
-                .FirstOrDefault(scene => scene.sceneName.ToLower() == currentSceneName.ToLower());
-
-            if (sceneBestTime != null)
-            {
-                besttime = sceneBestTime.bestTime;
-                Debug.Log($"Loaded best time for scene {currentSceneName}: {besttime}");
-            }
-            else
-            {
-                besttime = 0;
-            }
-        }
-    }
-
-    public void SaveData(ref GameData data)
-    {
-        //outdated
-        if (besttime > 0)
-        {
-            string currentSceneName = SceneManager.GetActiveScene().name;
-            DatapersistenceManager.instance.UpdateBestTime(currentSceneName, besttime);
-            
-        }
-        else
-        {
-            Debug.LogWarning("Best time is 0. Nothing to save.");
-        }
-    }
 
     void Awake() //voi olla ongelmallinen!!!
     {
@@ -128,7 +91,6 @@ public class RacerScript : MonoBehaviour, IDataPersistence
         if (!racestarted || raceFinished) return; // Only run race logic if started
 
         HandleReset();
-        Ranking(); // Continuously update the rank
     }
 
     void OnTriggerEnter(Collider other)
@@ -163,7 +125,7 @@ public class RacerScript : MonoBehaviour, IDataPersistence
         .setOnComplete(() =>
         {
             RespawnAtLastCheckpoint();
-            LeanTween.value(respawnfade.GetComponent<RawImage>().color.a, 0f, length).setOnUpdate((float val) =>
+            LeanTween.value(respawnfade.GetComponent<RawImage>().color.a, 0f, 0.25f).setOnUpdate((float val) =>
             {
                 var img = respawnfade.GetComponent<RawImage>();
                 Color c = img.color;
@@ -413,16 +375,6 @@ public class RacerScript : MonoBehaviour, IDataPersistence
             Car1Hud.SetActive(true);
 
         InitializeRace();
-        Ranking();
-    }
-
-    public void Ranking()
-    {
-        if (GameManager.instance != null && laptime > 0)
-        {
-            float score = GameManager.instance.score;
-            Rank = score / laptime;
-        }
     }
 
     public void StartRace() // <-- Call this from Waitbeforestart
