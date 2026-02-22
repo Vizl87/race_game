@@ -57,8 +57,8 @@ public class RacerScript : MonoBehaviour
         if (PlayerPrefs.GetInt("Reverse") == 1) foreach (Transform checkpoint in checkpoints) checkpoint.eulerAngles = new(checkpoint.eulerAngles.x, checkpoint.eulerAngles.y + 180.0f, checkpoint.eulerAngles.z);
 
         //now who the fuck is this??
-        finalLapImg = GameManager.instance.CarUI.transform.Find("finalLap").gameObject;
-        respawnfade = GameManager.instance.CarUI.transform.Find("respawnfade").gameObject;
+        if (GameManager.instance.CarUI != null) finalLapImg = GameManager.instance.CarUI.transform.Find("finalLap").gameObject;
+        if (GameManager.instance.CarUI != null) respawnfade = GameManager.instance.CarUI.transform.Find("respawnfade").gameObject;
 
         winMenu = GameObject.Find("WinMenu").GetComponentInChildren<Canvas>(true).gameObject;
         Minimap = GameObject.Find("Minimap");
