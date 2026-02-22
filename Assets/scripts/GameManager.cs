@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     public static RacerScript racerscript;
+    public GameObject CarUI;
 
     [Header("menut")]
     public bool isPaused = false;

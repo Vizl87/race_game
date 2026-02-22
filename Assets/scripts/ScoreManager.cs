@@ -78,7 +78,7 @@ public class ScoreManager : MonoBehaviour
     {
         TotalScoreText.text = "Final Score: " + GetScoreInt();
         TimeScoreText.text  = "Time: " + Mathf.FloorToInt(TimeStartPoint);
-        DriftScoreText.text = "Drift: " + Mathf.FloorToInt(scoreFloat);
+        DriftScoreText.text = "Drift: " + Mathf.FloorToInt(GetScoreInt() - TimeStartPoint);
     }
 
     public int GetScoreInt()  => racerScript != null && racerScript.raceFinished
