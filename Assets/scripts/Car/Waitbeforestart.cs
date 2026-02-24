@@ -9,7 +9,7 @@ public class Waitbeforestart : MonoBehaviour
     [SerializeField] private List<AudioSource> countSounds = new(4);
     private RacerScript racerScript;
 
-    void Awake()
+    void OnEnable()
     {
         racerScript = FindAnyObjectByType<RacerScript>();
     }
@@ -44,8 +44,6 @@ public class Waitbeforestart : MonoBehaviour
 
     IEnumerator ShowS1AfterDelay()
     {
-        yield return new WaitForSecondsRealtime(1.0f);
-
         for (int val = 0; val <= 2; val++)
         {
             countGraphics[val].SetActive(true);
