@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using TMPro;
+using UnityEditor.SearchService;
+using UnityEngine.SceneManagement;
 
 public class RacerScript : MonoBehaviour
 {
@@ -55,17 +57,9 @@ public class RacerScript : MonoBehaviour
 
         startFinishLine = GameObject.FindGameObjectWithTag("StartFinishLine").transform;
         checkpoints = GameObject.FindGameObjectsWithTag("checkpointTag").Select(a => a.transform).ToList();
-        winMenu = GameObject.Find("WinMenu").GetComponentInChildren<Canvas>(true).gameObject;
-        //now who the fuck is this??
-        if (GameManager.instance.CarUI != null) finalLapImg = GameManager.instance.CarUI.transform.Find("finalLap").gameObject;
+        if (SceneManager.GetActiveScene().name != "tutorial") SetupRacingShit();
         if (GameManager.instance.CarUI != null) respawnfade = GameManager.instance.CarUI.transform.Find("respawnfade").gameObject;
-        
         totalLaps = PlayerPrefs.GetInt("Laps");
-        if (PlayerPrefs.GetInt("Reverse") == 1)
-        {
-            foreach (Transform checkpoint in checkpoints) checkpoint.eulerAngles = new(checkpoint.eulerAngles.x, checkpoint.eulerAngles.y + 180.0f, checkpoint.eulerAngles.z);
-            startFinishLine.eulerAngles = new(startFinishLine.eulerAngles.x, startFinishLine.eulerAngles.y + 180.0f, startFinishLine.eulerAngles.z);
-        }
     }
 
     private void OnDisable()
@@ -103,6 +97,17 @@ public class RacerScript : MonoBehaviour
         if (trigger.gameObject.CompareTag("StartFinishLine")) HandleStart();
         else if (trigger.gameObject.CompareTag("RespawnTrigger")) FadeGameViewAndRespawn(0.8f);
         else HandleCheck(trigger);
+    }
+
+    private void SetupRacingShit()
+    {
+        winMenu = GameObject.Find("WinMenu").GetComponentInChildren<Canvas>(true).gameObject;
+        if (GameManager.instance.CarUI != null) finalLapImg = GameManager.instance.CarUI.transform.Find("finalLap").gameObject;
+        if (PlayerPrefs.GetInt("Reverse") == 1)
+        {
+            foreach (Transform checkpoint in checkpoints) checkpoint.eulerAngles = new(checkpoint.eulerAngles.x, checkpoint.eulerAngles.y + 180.0f, checkpoint.eulerAngles.z);
+            startFinishLine.eulerAngles = new(startFinishLine.eulerAngles.x, startFinishLine.eulerAngles.y + 180.0f, startFinishLine.eulerAngles.z);
+        }
     }
 
     //helper method fadeaamiselle

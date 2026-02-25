@@ -16,6 +16,17 @@ public class Waitbeforestart : MonoBehaviour
     void Start()
     {
         LogitechLedController.Clear();
+        if (GameManager.instance.sceneSelected != "tutorial")
+        {
+            SetupCountdown();
+            StartCoroutine(ShowS1AfterDelay());
+            Time.timeScale = 0f;
+        }
+        else StartCoroutine(NoCountdown());
+    }
+
+    void SetupCountdown()
+    {
         for (int val = 3; val >= 1; val--)
         {
             countGraphics.Add(GameManager.instance.CarUI.transform.Find($"s{val}").gameObject);
@@ -26,18 +37,11 @@ public class Waitbeforestart : MonoBehaviour
         countSounds.Add(GameObject.Find("countGo").GetComponent<AudioSource>());
         
         foreach (GameObject img in countGraphics) img.SetActive(false);
-
-        if (GameManager.instance.sceneSelected != "tutorial")
-        {
-            StartCoroutine(ShowS1AfterDelay());
-            Time.timeScale = 0f;
-        }
-        else StartCoroutine(NoCountdown());
     }
 
     IEnumerator NoCountdown()
     {
-        yield return new WaitForSecondsRealtime(0f);
+        yield return null;
         LogitechLedController.Clear();
         racerScript.StartRace();
     }
