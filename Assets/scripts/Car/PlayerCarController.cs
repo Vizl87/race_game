@@ -3,9 +3,8 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using Logitech;
 using System.Linq;
-using System.Runtime.Serialization.Formatters;
-using UnityEngine.AI;
 using System.Collections;
+
 
 
 public class PlayerCarController : BaseCarController
@@ -19,9 +18,16 @@ public class PlayerCarController : BaseCarController
 
     private PlayerInput PlayerInput;
     private string CurrentControlScheme = "Keyboard";
-
-    protected Coroutine DriftBoost;
+    [SerializeField] protected int turbeChargeAmount = 3;
     
+    public enum TurbeType
+    {
+        HandleTurbo,
+        TurbeChargeBoost
+    }
+
+    protected Coroutine TurbeBoost;
+    protected TurbeType turbeType = TurbeType.HandleTurbo;
 
 
     
@@ -151,6 +157,8 @@ public class PlayerCarController : BaseCarController
         Move();
         Steer();
 
+        
+
         Decelerate();
         Applyturnsensitivity(speed);
         OnGrass();
@@ -209,8 +217,16 @@ public class PlayerCarController : BaseCarController
     protected void HandleTurbo()
     {
         if (!CanUseTurbo) return;
-        TURBE();
-        TURBEmeter();
+
+        if (turbeType == TurbeType.HandleTurbo)
+        {
+            TURBE();
+            TURBEmeter();
+        }
+        else if (turbeType == TurbeType.TurbeChargeBoost)
+        {
+            TurbeChargeBoost();
+        }
     }
 
     protected void TURBE()
@@ -223,6 +239,7 @@ public class PlayerCarController : BaseCarController
             TargetTorque = Mathf.Min(TargetTorque, MaxAcceleration); 
         }
     }
+
 
     void Move()
     {
@@ -367,6 +384,28 @@ public class PlayerCarController : BaseCarController
         }
     }
 
+    protected void TurbeChargeBoost()
+    {
+        bool turbepressed = Controls.CarControls.turbo.IsPressed();
+        IsTurboActive = turbepressed && turbeChargeAmount > 0;
+
+        float turbecharge = Mathf.InverseLerp(8f, 12f, turbechargepush);
+        float TurbeStrength = Mathf.Lerp(3f, 7f, turbecharge);
+        float Duration = 6.3f;
+        
+        if (IsTurboActive && !turbepressed)
+        {
+            turbeChargeAmount--;
+            print(turbeChargeAmount);
+
+            if (TurbeBoost != null)
+                StopCoroutine(TurbeBoost);
+
+            TurbeBoost = StartCoroutine(BoostCoroutine(TurbeStrength, Duration));
+        }
+    
+    }
+
     public void OnDriftEndBoostTheCar()
     {
         float driftmultiplier = ScoreManager.instance.CurrentDriftMultiplier;
@@ -375,16 +414,18 @@ public class PlayerCarController : BaseCarController
 
         float turbe = Mathf.InverseLerp(4f, 10f, driftmultiplier);
         float TurbeStrength = Mathf.Lerp(1f, 5f, turbe);
+        float Duration = 3.5f;
 
-        if (DriftBoost != null)
-            StopCoroutine(DriftBoost);
+        if (TurbeBoost != null)
+            StopCoroutine(TurbeBoost);
 
-        DriftBoost = StartCoroutine(DriftBoostCoroutine(TurbeStrength));
+        TurbeBoost = StartCoroutine(BoostCoroutine(TurbeStrength, Duration));
     }
 
-    private IEnumerator DriftBoostCoroutine(float TurbeStrength)
+    private IEnumerator BoostCoroutine(float TurbeStrength, float Duration)
     {
         float originalspeed = Maxspeed;
+
         float boostedMax = Mathf.Max(BaseSpeed + Turbesped, originalspeed + TurbeStrength);
 
         float duration = Mathf.Lerp(2.5f, 4.5f, Mathf.InverseLerp(2f, 5f, TurbeStrength));
@@ -405,6 +446,6 @@ public class PlayerCarController : BaseCarController
         }
 
         Maxspeed = originalspeed;
-        DriftBoost = null;
+        TurbeBoost = null;
     }
 }
