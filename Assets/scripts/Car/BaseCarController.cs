@@ -160,7 +160,7 @@ public class BaseCarController : MonoBehaviour
 
     protected void AdjustSpeedForGrass()
     {
-        if (IsOnGrass())
+        if (IsOnGrass() && !IsTurboActive)
         {
             TargetTorque *= GrassSpeedMultiplier;
 
