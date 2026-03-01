@@ -234,7 +234,7 @@ public class PlayerCarController : BaseCarController
         IsTurboActive = Controls.CarControls.turbo.IsPressed() && TurbeAmount > 0;
         if (IsTurboActive)
         {
-            CarRb.AddForce(transform.forward * Turbepush, ForceMode.Acceleration);
+            CarRb.AddForce(Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized * Turbepush, ForceMode.Acceleration);
             TargetTorque = PerusTargetTorque * 1.5f;                
             TargetTorque = Mathf.Min(TargetTorque, MaxAcceleration); 
         }
